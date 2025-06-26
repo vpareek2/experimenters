@@ -1,11 +1,13 @@
 # experimenters/utils/metrics.py
 import time
 
+
 class ThroughputMeter:
     """
     Rolling tokens/sec counter.
     Keeps the last `window` measurements and exposes `rate` property.
     """
+
     def __init__(self, window: int = 100):
         self.window = window
         self.counter = 0
