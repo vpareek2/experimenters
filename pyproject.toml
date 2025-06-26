@@ -1,0 +1,17 @@
+[project]
+name = "experimenters"
+version = "0.0.1"
+description = "Plug-and-play transformer research sandbox"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.1"]
+
+[project.optional-dependencies]
+dev  = ["pytest", "ruff", "black", "pre-commit"]
+fast = ["triton>=2.2", "flash-attn>=2.5"]
+
+[tool.setuptools]
+package-dir = {"" = "experiments"}
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
