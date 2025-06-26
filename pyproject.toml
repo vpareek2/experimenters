@@ -3,14 +3,16 @@ name = "experimenters"
 version = "0.0.1"
 description = "Plug-and-play transformer research sandbox"
 requires-python = ">=3.10"
-dependencies = ["torch>=2.1"]
+dependencies = ["torch>=2.1", "numpy"]
 
 [project.optional-dependencies]
 dev  = ["pytest", "ruff", "black", "pre-commit"]
-fast = ["triton>=2.2", "flash-attn>=2.5"]
 
 [tool.setuptools]
 package-dir = {"" = "experimenters"}
+
+[tool.setuptools.packages.find]
+where = ["experimenters"]
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]
