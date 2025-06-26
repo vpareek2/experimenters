@@ -9,10 +9,11 @@ dependencies = ["torch>=2.1", "numpy"]
 dev  = ["pytest", "ruff", "black", "pre-commit"]
 
 [tool.setuptools]
-package-dir = {"" = "experimenters"}
+package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
-where = ["experimenters"]
+include = ["experimenters*"]
+
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]
