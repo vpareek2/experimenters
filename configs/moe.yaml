@@ -1,0 +1,23 @@
+dim: 256
+n_layers: 8
+n_heads: 4
+max_seq_len: 256
+vocab_size: 129280
+
+attn_type: MLA
+ffn_type: MoE
+moe_layers: 4
+
+ffn:
+  n_experts: 16
+  top_k: 2
+  hidden_mult: 4
+
+lr: 3e-4
+batch_size: 128
+seq_len: 256
+max_steps: 1000
+log_interval: 50
+weight_decay: 0.1
+
+dataset_cls: experimenters.tools.tiny_dataset.load   # placeholder factory

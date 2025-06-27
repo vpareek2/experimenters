@@ -3,7 +3,7 @@ name = "experimenters"
 version = "0.0.1"
 description = "Plug-and-play transformer research sandbox"
 requires-python = ">=3.10"
-dependencies = ["torch>=2.1", "numpy"]
+dependencies = ["torch>=2.1", "numpy", "dacite"]
 
 [project.optional-dependencies]
 dev  = ["pytest", "ruff", "black", "pre-commit"]
@@ -18,3 +18,6 @@ include = ["experimenters*"]
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project.scripts]
+experiment = "experimenters.tools.experiment:main"
