@@ -64,7 +64,7 @@ class WandbLogger:
     def __init__(self, project: str = "experimenters-demo", **kw):
         self.enabled = False
         try:
-            import wandb
+            import wandb # type: ignore
             self.wandb = wandb
             self.wandb.init(project=project, **kw)
             self.enabled = True
