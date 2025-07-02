@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader
 from experimenters.utils.checkpoint import save_checkpoint
 from experimenters.utils.metrics import ThroughputMeter
 from experimenters.config import ModelConfig
+from experimenters.data.loader import load_dataset
+
 
 class Trainer:
     """
@@ -13,7 +15,7 @@ class Trainer:
 
     Required in cfg:
         lr, batch_size, seq_len, max_steps OR max_minutes
-        dataset_cls (callable returning an IterableDataset)
+        dataset_cls (callable returning an IterableDataset) or data (for load_dataset)
     """
 
     def __init__(self,
@@ -27,7 +29,13 @@ class Trainer:
         self.model.to(self.device)
 
         # --- dataset --------------------------------------------------------
-        ds = cfg.dataset_cls(cfg)               # user supplies dataset factory
+        if hasattr(cfg, "data") and cfg.data:
+            ds = load_dataset(cfg.data, cfg)
+        elif hasattr(cfg, "dataset_cls"):
+            ds = cfg.dataset_cls(cfg)        # legacy path
+        else:
+            raise ValueError("No dataset specified (cfg.data or cfg.dataset_cls)")
+
         self.loader = DataLoader(ds,
                                  batch_size=cfg.batch_size,
                                  pin_memory=True,
