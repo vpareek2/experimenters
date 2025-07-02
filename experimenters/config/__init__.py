@@ -1,8 +1,13 @@
-# experimenters/config/__init__.py
-import yaml, dacite
-from pathlib import Path
-from experimenters.config.model import TransformerCfg    # re-export
+"""Public re-export surface for typed configs.
 
-def load_cfg(path: str | Path) -> TransformerCfg:
-    data = yaml.safe_load(Path(path).read_text())
-    return dacite.from_dict(TransformerCfg, data)
+This stub lets callers `from experimenters.config import ModelConf` while
+keeping the actual dataclasses in *schema.py*.
+"""
+from .schema import ModelConf, MLAConf, SwiGLUConf, MoEConf
+
+__all__ = [
+    "ModelConf",
+    "MLAConf",
+    "SwiGLUConf",
+    "MoEConf",
+]
