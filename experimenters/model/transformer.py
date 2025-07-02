@@ -5,7 +5,6 @@ from __future__ import annotations
 `nn.Module` configured via `experimenters.config.schema.ModelConf`.
 """
 
-import torch
 import torch.nn as nn
 
 from experimenters.embed.token import TokenEmbedding
