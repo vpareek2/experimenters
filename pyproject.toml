@@ -3,7 +3,7 @@ name = "experimenters"
 version = "0.0.1"
 description = "Plug-and-play transformer research sandbox"
 requires-python = ">=3.10"
-dependencies = ["torch>=2.1", "numpy", "dacite"]
+dependencies = ["torch>=2.1", "numpy", "dacite", "datasets", "transformers"]
 
 [project.optional-dependencies]
 dev  = ["pytest", "ruff", "black", "pre-commit"]
