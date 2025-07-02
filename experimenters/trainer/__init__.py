@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from experimenters.utils.checkpoint import save_checkpoint
 from experimenters.utils.metrics import ThroughputMeter
-from experimenters.config.model import TransformerCfg
+from experimenters.config import ModelConf
 
 class Trainer:
     """
@@ -18,7 +18,7 @@ class Trainer:
 
     def __init__(self,
                  model: nn.Module,
-                 cfg: TransformerCfg,
+                 cfg: ModelConf,
                  *,
                  device: str | None = None):
         self.model = model
