@@ -83,6 +83,11 @@ class Trainer:
 
             self.optim.zero_grad(set_to_none=True)
             loss.backward()
+            if getattr(self.cfg, "grad_clip_norm", None) is not None:
+                torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(),
+                    self.cfg.grad_clip_norm
+                )
             self.optim.step()
 
             self.meter.update(batch.numel())

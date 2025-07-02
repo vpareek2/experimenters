@@ -82,6 +82,7 @@ class ModelConfig:
     max_steps: int = 1_000
     weight_decay: float = 0.1
     log_interval: int = 50
+    grad_clip_norm: float | None = 1.0
 
     def __post_init__(self):
         assert self.dim % self.n_heads == 0, "dim must be divisible by n_heads"

@@ -15,7 +15,7 @@ class RandTok(IterableDataset):
 cfg = xp.ModelConfig(
     dim=128, n_layers=4, n_heads=4,
     attn_type="MHA", ffn_type="GELU",
-    seq_len=128, batch_size=32, max_steps=5,
+    seq_len=128, batch_size=32, max_steps=5, grad_clip_norm=1.0,
     data=xp.DataConfig(src=lambda c: RandTok(c.seq_len, c.vocab_size)),
 )
 
