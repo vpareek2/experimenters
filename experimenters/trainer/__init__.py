@@ -36,10 +36,11 @@ class Trainer:
         else:
             raise ValueError("No dataset specified (cfg.data or cfg.dataset_cls)")
 
+        num_workers = getattr(cfg, "num_workers", 0 if callable(cfg.data.src) else 2)
         self.loader = DataLoader(ds,
                                  batch_size=cfg.batch_size,
                                  pin_memory=True,
-                                 num_workers=2)
+                                 num_workers=num_workers)
 
         # --- optimizer & loss ----------------------------------------------
         self.optim = torch.optim.AdamW(model.parameters(),

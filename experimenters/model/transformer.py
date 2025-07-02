@@ -27,8 +27,15 @@ def _hidden_dim(model_dim: int, ffn_cfg: SwiGLUConfig | MoEConfig):
 #  Public factory
 # -----------------------------------------------------------------------------
 
-def build_transformer(cfg: ModelConfig, *, attn_cls, ffn_cls):
-    """Create a `nn.Module` according to *cfg* using the supplied block classes."""
+def build_transformer(cfg: ModelConfig, *, attn_cls=None, ffn_cls=None):
+    """Create a `nn.Module` according to *cfg* using the supplied or looked-up block classes."""
+
+    # --------------------------------------------------
+    #  NEW: automatic lookup if the caller passes None
+    # --------------------------------------------------
+    if attn_cls is None or ffn_cls is None:
+        attn_cls, _ = ATTN[cfg.attn_type]
+        ffn_cls,  _ = FFN [cfg.ffn_type]
 
     model_dim = cfg.dim
     hid_dim = _hidden_dim(model_dim, cfg.ffn)
@@ -48,10 +55,12 @@ def build_transformer(cfg: ModelConfig, *, attn_cls, ffn_cls):
         def __init__(self, layer_idx: int):
             super().__init__()
             self.norm1 = RMSNorm(model_dim)
+            # ---------------- attention -----------------
+            attn_kwargs = cfg.attn.__dict__ if cfg.attn_type == "MLA" else {}
             self.attn = attn_cls(
                 model_dim,
                 cfg.n_heads,
-                **cfg.attn.__dict__,
+                **attn_kwargs,
             )
             self.norm2 = RMSNorm(model_dim)
 

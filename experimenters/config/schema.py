@@ -1,48 +1,45 @@
 from __future__ import annotations
-
 """Typed configuration schemas for *experimenters*.
 
-These dataclasses replace the old YAML→dacite plumbing.  Each block has its
-own schema so users get IDE autocompletion and mypy checking.
+Exposed at top‑level import::
 
-Usage
------
->>> from experimenters.config.schema import ModelConf, MLAConf, MoEConf
->>> cfg = ModelConf(dim=512, attn=MLAConf(latent_dim=128), ffn=MoEConf(n_experts=32))
+    import experimenters as xp
+    cfg = xp.ModelConfig(...)
 
-The resulting `cfg` object can be passed straight to `build_transformer(cfg)`.
+Main classes
+------------
+* ``ModelConfig`` – global model + training hyper‑params (+ optional ``data``)
+* ``MLAConfig``   – attention‑specific knobs (Multi‑Head Latent Attention)
+* ``SwiGLUConfig`` & ``MoEConfig`` – feed‑forward variants
+* ``DataConfig`` lives in ``experimenters.data.schema`` and can be attached to
+  ``ModelConfig.data`` to auto‑load datasets.
 """
-
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
-# -----------------------------------------------------------------------------
-#  Attention-specific knobs
-# -----------------------------------------------------------------------------
+if TYPE_CHECKING:                # avoid runtime circular import
+    from experimenters.data.schema import DataConfig
+
+# ---------------------------------------------------------------------------
+#  Attention‑specific config
+# ---------------------------------------------------------------------------
 
 @dataclass
 class MLAConfig:
-    """Configuration for Multi-Head Latent Attention (MLA)."""
-
-    latent_dim: int = 64                # r – compressed K/V size
-    qk_nope_dim: int = 16              # dims that skip RoPE
-    qk_rope_dim: int = 16              # dims that get RoPE
+    latent_dim: int = 64
+    qk_nope_dim: int = 16
+    qk_rope_dim: int = 16
     v_head_dim: int = 128
-    rope_factor: int = 40              # YaRN scaling factor
-    mscale: float = 1.0               # additional multiplier
+    rope_factor: int = 40
+    mscale: float = 1.0
 
-    def __post_init__(self):
-        assert self.qk_nope_dim + self.qk_rope_dim > 0, "qk dims must be > 0"
-
-
-# -----------------------------------------------------------------------------
-#  Feed-forward Family
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+#  Feed‑forward configs
+# ---------------------------------------------------------------------------
 
 @dataclass
 class SwiGLUConfig:
-    hidden_mult: int = 4               # FFN hidden size = hidden_mult × model.dim
-
+    hidden_mult: int = 4
 
 @dataclass
 class MoEConfig:
@@ -53,18 +50,12 @@ class MoEConfig:
     topk_groups: int = 1
     n_shared_experts: int = 2
 
-    def __post_init__(self):
-        assert self.n_experts >= self.top_k, "top_k cannot exceed n_experts"
-
-
-# -----------------------------------------------------------------------------
-#  Model-level geometry & block selection
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+#  Top‑level model / training config
+# ---------------------------------------------------------------------------
 
 @dataclass
 class ModelConfig:
-    """Top-level transformer configuration."""
-
     # Geometry
     dim: int = 256
     n_layers: int = 8
@@ -72,25 +63,27 @@ class ModelConfig:
     max_seq_len: int = 1024
     vocab_size: int = 50_257
 
-    # Which block types to use
-    attn_type: Literal["MLA"] = "MLA"
-    ffn_type: Literal["SwiGLU", "MoE"] = "SwiGLU"
-    moe_layers: int = 0                # last N layers become MoE
+    # Block choices
+    attn_type: Literal["MLA", "MHA"] = "MLA"
+    ffn_type:  Literal["SwiGLU", "MoE"] = "SwiGLU"
+    moe_layers: int = 0                     # last N layers become MoE
 
-    # Nested configs – default factories mean they are fully-populated by default
+    # Nested per‑block configs
     attn: MLAConfig = field(default_factory=MLAConfig)
     ffn:  SwiGLUConfig | MoEConfig = field(default_factory=SwiGLUConfig)
 
-    # Trainer/runtime hints (optional at build time)
+    # Optional dataset description (used by Trainer)
+    data: "DataConfig | None" = None
+
+    # Training hyper‑parameters (used by Trainer)
     lr: float = 3e-4
     batch_size: int = 128
     seq_len: int = 512
     max_steps: int = 1_000
     weight_decay: float = 0.1
+    log_interval: int = 50
 
     def __post_init__(self):
         assert self.dim % self.n_heads == 0, "dim must be divisible by n_heads"
         if self.ffn_type == "MoE":
-            assert isinstance(self.ffn, MoEConfig), "ffn field must be MoEConfig when ffn_type='MoE'"
-        else:
-            assert isinstance(self.ffn, SwiGLUConfig), "ffn field must be SwiGLUConfig when ffn_type='SwiGLU'"
+            assert isinstance(self.ffn, MoEConfig), "ffn must be MoEConfig when ffn_type='MoE'"
