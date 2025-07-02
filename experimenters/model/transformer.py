@@ -11,14 +11,14 @@ from experimenters.embed.token import TokenEmbedding
 from experimenters.embed.rope import precompute_rope_freqs
 from experimenters.norm import RMSNorm
 from experimenters.registry import ATTN, FFN
-from experimenters.config.schema import ModelConf, MoEConf, SwiGLUConf
+from experimenters.config.schema import ModelConfig, MoEConfig, SwiGLUConfig
 
 # -----------------------------------------------------------------------------
 #  Helper: hidden dim calculation
 # -----------------------------------------------------------------------------
 
-def _hidden_dim(model_dim: int, ffn_cfg: SwiGLUConf | MoEConf):
-    if isinstance(ffn_cfg, SwiGLUConf):
+def _hidden_dim(model_dim: int, ffn_cfg: SwiGLUConfig | MoEConfig):
+    if isinstance(ffn_cfg, SwiGLUConfig):
         return model_dim * ffn_cfg.hidden_mult
     # fallback multiplier for MoE when nothing else specified
     return model_dim * 4
@@ -27,7 +27,7 @@ def _hidden_dim(model_dim: int, ffn_cfg: SwiGLUConf | MoEConf):
 #  Public factory
 # -----------------------------------------------------------------------------
 
-def build_transformer(cfg: ModelConf, *, attn_cls, ffn_cls):
+def build_transformer(cfg: ModelConfig, *, attn_cls, ffn_cls):
     """Create a `nn.Module` according to *cfg* using the supplied block classes."""
 
     model_dim = cfg.dim
@@ -56,7 +56,7 @@ def build_transformer(cfg: ModelConf, *, attn_cls, ffn_cls):
             self.norm2 = RMSNorm(model_dim)
 
             sel_cls, sel_cfg = choose_ffn(layer_idx)
-            if isinstance(sel_cfg, SwiGLUConf):
+            if isinstance(sel_cfg, SwiGLUConfig):
                 # SwiGLU signature: (dim, hidden_dim)
                 self.ffn = sel_cls(model_dim, hid_dim)
             else:

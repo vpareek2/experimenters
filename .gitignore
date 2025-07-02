@@ -193,3 +193,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 __pycache__/
+tests

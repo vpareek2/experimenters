@@ -21,7 +21,7 @@ from typing import Literal
 # -----------------------------------------------------------------------------
 
 @dataclass
-class MLAConf:
+class MLAConfig:
     """Configuration for Multi-Head Latent Attention (MLA)."""
 
     latent_dim: int = 64                # r – compressed K/V size
@@ -40,12 +40,12 @@ class MLAConf:
 # -----------------------------------------------------------------------------
 
 @dataclass
-class SwiGLUConf:
+class SwiGLUConfig:
     hidden_mult: int = 4               # FFN hidden size = hidden_mult × model.dim
 
 
 @dataclass
-class MoEConf:
+class MoEConfig:
     n_experts: int = 16
     top_k: int = 2
     route_scale: float = 1.0
@@ -62,7 +62,7 @@ class MoEConf:
 # -----------------------------------------------------------------------------
 
 @dataclass
-class ModelConf:
+class ModelConfig:
     """Top-level transformer configuration."""
 
     # Geometry
@@ -78,8 +78,8 @@ class ModelConf:
     moe_layers: int = 0                # last N layers become MoE
 
     # Nested configs – default factories mean they are fully-populated by default
-    attn: MLAConf = field(default_factory=MLAConf)
-    ffn:  SwiGLUConf | MoEConf = field(default_factory=SwiGLUConf)
+    attn: MLAConfig = field(default_factory=MLAConfig)
+    ffn:  SwiGLUConfig | MoEConfig = field(default_factory=SwiGLUConfig)
 
     # Trainer/runtime hints (optional at build time)
     lr: float = 3e-4
@@ -91,6 +91,6 @@ class ModelConf:
     def __post_init__(self):
         assert self.dim % self.n_heads == 0, "dim must be divisible by n_heads"
         if self.ffn_type == "MoE":
-            assert isinstance(self.ffn, MoEConf), "ffn field must be MoEConf when ffn_type='MoE'"
+            assert isinstance(self.ffn, MoEConfig), "ffn field must be MoEConfig when ffn_type='MoE'"
         else:
-            assert isinstance(self.ffn, SwiGLUConf), "ffn field must be SwiGLUConf when ffn_type='SwiGLU'"
+            assert isinstance(self.ffn, SwiGLUConfig), "ffn field must be SwiGLUConfig when ffn_type='SwiGLU'"

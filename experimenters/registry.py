@@ -7,19 +7,19 @@ from __future__ import annotations
 
 from experimenters.attn import MLA
 from experimenters.ffn import SwiGLU, MoE
-from experimenters.config.schema import MLAConf, SwiGLUConf, MoEConf
+from experimenters.config.schema import MLAConfig, SwiGLUConfig, MoEConfig
 
 # -----------------------------------------------------------------------------
 #  Public registries
 # -----------------------------------------------------------------------------
 
 ATTN: dict[str, tuple[type, type]] = {
-    "MLA": (MLA, MLAConf),
+    "MLA": (MLA, MLAConfig),
 }
 
 FFN: dict[str, tuple[type, type]] = {
-    "SwiGLU": (SwiGLU, SwiGLUConf),
-    "MoE": (MoE, MoEConf),
+    "SwiGLU": (SwiGLU, SwiGLUConfig),
+    "MoE": (MoE, MoEConfig),
 }
 
 __all__ = ["ATTN", "FFN"]
