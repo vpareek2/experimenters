@@ -38,6 +38,7 @@ class Trainer:
         self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
         self.model.to(self.device)
         self.callbacks = callbacks or []
+        self.metrics: dict[str, float] = {}
 
         # -----------------------------------------------------------------
         # Dataset selection: cfg.data preferred, else legacy cfg.dataset_cls
